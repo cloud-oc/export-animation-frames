@@ -1,0 +1,13 @@
+{
+  "name": "export-animation-frames",
+  "displayName": "导出动画图层帧",
+  "description": "选中图层，导出时间轴上的所有帧为独立图片文件，支持去重、裁切、缩放。",
+  "version": "1.0.0",
+  "author": "Cloud09",
+  "categories": ["scripts"],
+  "contributes": {
+    "scripts": [
+      { "path": "./export-animation-frames.lua" }
+    ]
+  }
+}
