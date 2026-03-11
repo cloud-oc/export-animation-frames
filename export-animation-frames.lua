@@ -41,25 +41,13 @@ end
 local function framesAreEqual(cel1, cel2)
     if not cel1 and not cel2 then return true end
     if not cel1 or not cel2 then return false end
+    -- 只通过判断图像引用和位置是否一致判断是否为相同帧
+    -- 支持 Aseprite 的延长帧(Pill)或链接帧(Linked Cels)去重
+    -- 深度像素循环对比会错误去重人工故意分离复制的画格，且大幅拖慢性能
     if cel1.image == cel2.image and cel1.position.x == cel2.position.x and cel1.position.y == cel2.position.y then
         return true
     end
-    if cel1.image.width ~= cel2.image.width or cel1.image.height ~= cel2.image.height then
-        return false
-    end
-    if cel1.position.x ~= cel2.position.x or cel1.position.y ~= cel2.position.y then
-        return false
-    end
-    local img1 = cel1.image
-    local img2 = cel2.image
-    for y = 0, img1.height - 1 do
-        for x = 0, img1.width - 1 do
-            if img1:getPixel(x, y) ~= img2:getPixel(x, y) then
-                return false
-            end
-        end
-    end
-    return true
+    return false
 end
 
 ------------------------------------------------------------------------
@@ -261,8 +249,11 @@ local function doExport()
         for i, frame in ipairs(sprite.frames) do
             local cel = layer:cel(frame.frameNumber)
 
-            if not cel and skip_empty then
-                goto scan_continue
+            if not cel then
+                if skip_empty then
+                    prev_cel = nil -- 空白帧打断去重连续性，重新比对
+                    goto scan_continue
+                end
             end
 
             if skip_duplicates and prev_cel ~= nil and framesAreEqual(cel, prev_cel) then
