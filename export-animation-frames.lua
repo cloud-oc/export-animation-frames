@@ -276,7 +276,7 @@ local function doExport()
             total_duration_ms = total_duration_ms + frame.duration * 1000
         end
 
-        local fps = math.floor(#unique_frames / (total_duration_ms / 1000) + 0.5)
+        local fps = #unique_frames / (total_duration_ms / 1000)
         if fps < 1 then fps = 1 end
 
         -- 第二遍：导出
@@ -286,7 +286,7 @@ local function doExport()
             local fname = dlg.data.filename
             fname = fname:gsub("{mapname}", spriteName)
             fname = fname:gsub("{layername}", layer.name)
-            fname = fname:gsub("{fps}", tostring(fps))
+            fname = fname:gsub("{fps}", string.format("%g", fps))
             fname = fname:gsub("{frame}", tostring(seq))
             fname = fname:gsub("{spritename}", spriteName)
             fname = fname .. "." .. out_format
